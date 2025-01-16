@@ -1,12 +1,12 @@
 
-               ___________________
+`               ___________________
 Sender________/          |||||||| \_______________
               v                   v
                   ^                       ^
                   ________________________
 Receiver_________/               |||||||| \____
 
-
+`
 # ParallelComm Library
 
 A `ParallelComm` library is designed to facilitate parallel communication between two devices using an 8-bit 
