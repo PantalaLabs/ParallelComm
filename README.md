@@ -17,7 +17,7 @@ The library handles the communication protocol, ensuring data is transmitted and
 
 ### Installation
 
-'''
+```ruby
                ___________________
 Sender________/          |||||||| \_______________
               v                   v
@@ -25,4 +25,4 @@ Sender________/          |||||||| \_______________
                   ________________________
 Receiver_________/               |||||||| \____
 
-'''
+```
