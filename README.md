@@ -6,7 +6,7 @@ One of them is a DSP, or digital signal processor. I was developing one
 and wanted a display with some information, waveform, parameters values, etc..
 but I could not call a TFT or OLED display with I2C, or SPI or even Serial 
 using another microcontroller. The solution was to use the small amount of 
-CPU time available to set digital pins and make the transfer with NON BLOCKING CPU 
+CPU time available to set digital pins and make the transfer with Non-blocking CPU code  
 to another microcontroller connected to the display. 
 The library was born. Today it sends one byte, but for example, 
 it can send 2 messages : 
