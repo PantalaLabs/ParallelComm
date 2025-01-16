@@ -42,9 +42,6 @@ The library handles the communication protocol, ensuring data is transmitted and
 - **State Management**: Implements state machines for both Sender and Receiver to manage communication states.
 - **Easy to Use**: Simple API for sending and receiving data.
 
-## Usage
-
-### Installation
 
 ```ruby
                ___________________
