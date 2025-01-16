@@ -1,12 +1,4 @@
 
-`               ___________________
-Sender________/          |||||||| \_______________
-              v                   v
-                  ^                       ^
-                  ________________________
-Receiver_________/               |||||||| \____
-
-`
 # ParallelComm Library
 
 A `ParallelComm` library is designed to facilitate parallel communication between two devices using an 8-bit 
@@ -24,3 +16,13 @@ The library handles the communication protocol, ensuring data is transmitted and
 ## Usage
 
 ### Installation
+
+'''
+               ___________________
+Sender________/          |||||||| \_______________
+              v                   v
+                  ^                       ^
+                  ________________________
+Receiver_________/               |||||||| \____
+
+'''
