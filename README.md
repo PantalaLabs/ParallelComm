@@ -24,9 +24,13 @@ Performance,
 
 ```
 all UNO->UNO
-1355 msg / seg ~= 21600 bps - 6 stages sender machine state (1st version)
-2970 msg / seg ~= 23760 bps - 3 stages sender machine state (2nd version)
-4160 msg / seg ~= 33280 bps - 3 stages sender machine state + UNO port manipulation (actual version)
+// 6 stages sender machine state
+// 1355 msg / seg ~= 21600 bps - 6 stages sender machine state
+// 3 stages sender machine state
+// 2970 msg / seg ~= 23760 bps - 
+// 4160 msg / seg ~= 33280 bps - native port manipulation
+// 3400 msg / seg ~= 27200 bps - receiver with digitalWriteFast library (probably due to caller functions)
+// 2970 msg / seg ~= 23720 bps - sender and receiver with digitalWriteFast library (probably due to caller functions)
 ```
 
 A `ParallelComm` library is designed to facilitate parallel communication between two devices using an 8-bit 
