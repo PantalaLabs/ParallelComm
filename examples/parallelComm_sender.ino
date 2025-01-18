@@ -1,19 +1,33 @@
 #include <ParallelComm.h>
 
-#define SENDERPIN 10   // deve ser o mesmo para os dois lados
-#define RECEIVERPIN 11 // deve ser o mesmo para os dois lados
-uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-
+#define SENDERPIN 12   // deve ser o mesmo para os dois lados
+#define RECEIVERPIN 13 // deve ser o mesmo para os dois lados
+uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
+uint16_t data;
+uint8_t num1;
+uint8_t num2;
 ParallelComm comm(dataBusPins, SENDERPIN, RECEIVERPIN, SENDER);
 
 void setup()
 {
-    Serial.begin(9600);
-    comm.begin();
+  Serial.begin(9600);
+  comm.begin();
 }
+
 
 void loop()
 {
-    uint16_t data = random(512, 1023); //send up to 10 bits
-    comm.updateSender(data); // PACK_2NUMSTO_8BITS(random(32), random(8), 5)
+
+  if (comm.updateSender(data))
+  {
+    // example 1 , one 8 bit number
+    // data = random(235, 250);
+    // Serial.println(data);
+
+    //example 2 , send one 5 bit number and another 3 bit number
+    num1 = random(27, 30);
+    num2 = random(5);
+    data = PACK_2NUMSTO_XBITS(num1, num2 , 5, 8);
+    Serial.println(String(num1) + " " + String(num2));
+  }
 }

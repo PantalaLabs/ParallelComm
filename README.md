@@ -19,14 +19,10 @@ As soon as I have the DSP project ready, I will post photos.
 Performance,
 
 ```
-all UNO->UNO
-// 6 stages sender machine state
-// 1355 msg / seg ~= 21600 bps - 6 stages sender machine state
-// 3 stages sender machine state
-// 2970 msg / seg ~= 23760 bps - 
-// 4160 msg / seg ~= 33280 bps - native port manipulation
-// 3400 msg / seg ~= 27200 bps - receiver with digitalWriteFast library (probably due to caller functions)
-// 2970 msg / seg ~= 23720 bps - sender and receiver with digitalWriteFast library (probably due to caller functions)
+UNO->UNO 
+10 bits , pins 2,3,4,5,6,7,8,9
+12/13 sender / receiver
+4043 msg / seg ~= 32344 bps 
 ```
 
 ## Features

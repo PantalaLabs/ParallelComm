@@ -1,12 +1,14 @@
 #include <ParallelComm.h>
 
-#define SENDERPIN 10   // deve ser o mesmo para os dois lados
-#define RECEIVERPIN 11 // deve ser o mesmo para os dois lados
-uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+#define SENDERPIN 12   // deve ser o mesmo para os dois lados
+#define RECEIVERPIN 13 // deve ser o mesmo para os dois lados
+uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
 
 ParallelComm comm(dataBusPins, SENDERPIN, RECEIVERPIN, RECEIVER);
 
 uint16_t msgValue = 0; // importante ser 16 bits
+uint8_t num1;
+uint8_t num2;
 uint32_t count;
 uint32_t period;
 
@@ -22,7 +24,14 @@ void loop()
     if (comm.updateReceiver(msgValue))
     {
         count++;
-        Serial.println(msgValue);
+        // example 1 - one 8 bit number
+        // Serial.println(msgValue);
+
+        // example 2 , send one 5 bit number and another 3 bit number
+        UNPACK_2NUMSFROM_XBITS(msgValue, num1, num2, 5, 8);
+        Serial.println(String(num1) + " " + String(num2));
+
+        delay(800);
     }
     if (millis() >= period)
     {
