@@ -6,8 +6,8 @@ One of them is a DSP, or digital signal processor. I was developing one
 and wanted a display with some information, waveform, parameters values, etc..
 but I could not call a TFT or OLED display with I2C, or SPI or even Serial 
 using another microcontroller. The solution was to use the small amount of 
-CPU time available to set digital pins and make the transfer with Non-blocking CPU code  
-to another microcontroller connected to the display. 
+CPU time available to set digital pins and make the transfer with Non-blocking 
+CPU code to another microcontroller connected to the display. 
 The library was born. Today it sends one byte, but for example, 
 it can send 2 messages : 
 one containing the first 8 bits of a potentiometer, 
@@ -33,18 +33,11 @@ all UNO->UNO
 // 2970 msg / seg ~= 23720 bps - sender and receiver with digitalWriteFast library (probably due to caller functions)
 ```
 
-A `ParallelComm` library is designed to facilitate parallel communication between two devices using an 8-bit 
-data bus and 2 control pins. 
-It supports two roles: **Sender** (Master) and **Receiver** (Slave). 
-The library handles the communication protocol, ensuring data is transmitted and received correctly.
-
-
 ## Features
 
-- **8-bit Parallel Communication**: Uses an 8-bit data bus for transmitting data.
+- **UP to 16-bits Parallel Communication**: Uses any bits data bus for transmitting data.
+- **Pack and Unpack 2 numbers**: Pack/Unpack 2 numbers to transfer in one send.
 - **Two Device Roles**: Supports **Sender** (Master) and **Receiver** (Slave) roles.
-- **State Management**: Implements state machines for both Sender and Receiver to manage communication states.
-- **Easy to Use**: Simple API for sending and receiving data.
 
 
 ```ruby
