@@ -8,15 +8,11 @@ but I could not call a TFT or OLED display with I2C, or SPI or even Serial
 using another microcontroller. The solution was to use the small amount of 
 CPU time available to set digital pins and make the transfer with Non-blocking 
 CPU code to another microcontroller connected to the display. 
-The library was born. Today it sends one byte, but for example, 
-it can send 2 messages : 
-one containing the first 8 bits of a potentiometer, 
-and the second message, the last two bits of the potentiometer 
-and 5 more more bits of "potentiometer identifier", 
-or "value type identifier" and 
-there is still one bit missing (we already use 8 + 2 + 5) 
-to control the end of the message block (2 messages). 
-You must create your control.
+The library was born. Today it sends up to 2 bytes and you can send 2 
+numbers at once: 
+first number with the first 8 bits of a potentiometer, 
+and the second number, 5 bits bits to with "potentiometer identifier".
+If you need more , create a byte control.
 
 As soon as I have the DSP project ready, I will post photos.
 
