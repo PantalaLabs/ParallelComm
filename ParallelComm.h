@@ -3,37 +3,106 @@
 
 #include <Arduino.h>
 
+#define PACK_2NUMSTO_8BITS(num1, num2, bits_num1) (((num1 & ((1 << bits_num1) - 1)) << (8 - bits_num1)) | (num2 & ((1 << (8 - bits_num1)) - 1)))
+
+#define UNPACK_2NUMSFROM_8BITS(packed, num1, num2, bits_num1)    \
+  do                                                             \
+  {                                                              \
+    num1 = (packed >> (8 - bits_num1)) & ((1 << bits_num1) - 1); \
+    num2 = packed & ((1 << (8 - bits_num1)) - 1);                \
+  } while (0)
+  
+// #if defined(USEDIGITALWRITELIBRARY)
+// #include <digitalWriteFast.h>
+
+// #ifndef _NOP // required for some non Arduino cores
+// #define _NOP()                   \
+//     do                           \
+//     {                            \
+//         __asm__ volatile("nop"); \
+//     } while (0)
+// #endif
+
+// #if (defined(ARDUINO_AVR_MEGA) ||     \
+//      defined(ARDUINO_AVR_MEGA1280) || \
+//      defined(ARDUINO_AVR_MEGA2560) || \
+//      defined(__AVR_ATmega1280__) ||   \
+//      defined(__AVR_ATmega1281__) ||   \
+//      defined(__AVR_ATmega2560__) ||   \
+//      defined(__AVR_ATmega2561__) ||   \
+//      defined(ARDUINO_AVR_NANO) ||     \
+//      defined(ARDUINO_AVR_UNO))
+
+// #define WRITE_PIN(pin, value) digitalWriteFast(pin, value)
+// #define READ_PIN(pin) digitalReadFast(pin)
+// #define SET_PIN_MODE(pin, mode) pinModeFast(pin, mode)
+// #define SET_PIN_OUTPUT(pin) pinModeFast(pin, OUTPUT)
+// #define SET_PIN_INPUT(pin) pinModeFast(pin, INPUT)
+
+// #else
+
+// // Fallback para placas que não suportam manipulação direta de registradores
+// #define WRITE_PIN(pin, value) digitalWrite(pin, value)
+// #define READ_PIN(pin) digitalRead(pin)
+// #define SET_PIN_MODE(pin, mode) pinMode(pin, mode)
+// #define SET_PIN_OUTPUT(pin) pinMode(pin, OUTPUT)
+// #define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
+
+// #endif // Fim da definição de macros para placas específicas
+
+// #else
 // Macros para manipulação de pinos (compatíveis com Arduino Uno e Nano)
 #if defined(ARDUINO_AVR_NANO) || defined(ARDUINO_AVR_UNO)
-
 // Manipulação de pinos usando registradores para ATmega328P
-#define WRITE_PIN(pin, value) \
-    if (pin >= 0 && pin <= 7) { \
-        if (value) PORTD |= (1 << pin); \
-        else PORTD &= ~(1 << pin); \
-    } else if (pin >= 8 && pin <= 13) { \
-        if (value) PORTB |= (1 << (pin - 8)); \
-        else PORTB &= ~(1 << (pin - 8)); \
-    } else if (pin >= A0 && pin <= A5) { \
-        if (value) PORTC |= (1 << (pin - A0)); \
-        else PORTC &= ~(1 << (pin - A0)); \
+#define WRITE_PIN(pin, value)            \
+    if (pin >= 0 && pin <= 7)            \
+    {                                    \
+        if (value)                       \
+            PORTD |= (1 << pin);         \
+        else                             \
+            PORTD &= ~(1 << pin);        \
+    }                                    \
+    else if (pin >= 8 && pin <= 13)      \
+    {                                    \
+        if (value)                       \
+            PORTB |= (1 << (pin - 8));   \
+        else                             \
+            PORTB &= ~(1 << (pin - 8));  \
+    }                                    \
+    else if (pin >= A0 && pin <= A5)     \
+    {                                    \
+        if (value)                       \
+            PORTC |= (1 << (pin - A0));  \
+        else                             \
+            PORTC &= ~(1 << (pin - A0)); \
     }
 
-#define READ_PIN(pin) \
-    ((pin >= 0 && pin <= 7) ? ((PIND & (1 << pin)) ? HIGH : LOW) : \
-    (pin >= 8 && pin <= 13) ? ((PINB & (1 << (pin - 8))) ? HIGH : LOW) : \
-    (pin >= A0 && pin <= A5) ? ((PINC & (1 << (pin - A0))) ? HIGH : LOW) : LOW)
+#define READ_PIN(pin)                                                                                                                  \
+    ((pin >= 0 && pin <= 7) ? ((PIND & (1 << pin)) ? HIGH : LOW) : (pin >= 8 && pin <= 13) ? ((PINB & (1 << (pin - 8))) ? HIGH : LOW)  \
+                                                               : (pin >= A0 && pin <= A5)  ? ((PINC & (1 << (pin - A0))) ? HIGH : LOW) \
+                                                                                           : LOW)
 
-#define SET_PIN_MODE(pin, mode) \
-    if (pin >= 0 && pin <= 7) { \
-        if (mode == OUTPUT) DDRD |= (1 << pin); \
-        else DDRD &= ~(1 << pin); \
-    } else if (pin >= 8 && pin <= 13) { \
-        if (mode == OUTPUT) DDRB |= (1 << (pin - 8)); \
-        else DDRB &= ~(1 << (pin - 8)); \
-    } else if (pin >= A0 && pin <= A5) { \
-        if (mode == OUTPUT) DDRC |= (1 << (pin - A0)); \
-        else DDRC &= ~(1 << (pin - A0)); \
+#define SET_PIN_MODE(pin, mode)         \
+    if (pin >= 0 && pin <= 7)           \
+    {                                   \
+        if (mode == OUTPUT)             \
+            DDRD |= (1 << pin);         \
+        else                            \
+            DDRD &= ~(1 << pin);        \
+    }                                   \
+    else if (pin >= 8 && pin <= 13)     \
+    {                                   \
+        if (mode == OUTPUT)             \
+            DDRB |= (1 << (pin - 8));   \
+        else                            \
+            DDRB &= ~(1 << (pin - 8));  \
+    }                                   \
+    else if (pin >= A0 && pin <= A5)    \
+    {                                   \
+        if (mode == OUTPUT)             \
+            DDRC |= (1 << (pin - A0));  \
+        else                            \
+            DDRC &= ~(1 << (pin - A0)); \
     }
 
 #define SET_PIN_OUTPUT(pin) SET_PIN_MODE(pin, OUTPUT)
@@ -49,6 +118,8 @@
 #define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
 
 #endif // Fim da definição de macros para placas específicas
+
+// #endif //
 
 // Enumeradores para papéis e estados da comunicação
 enum DeviceRole

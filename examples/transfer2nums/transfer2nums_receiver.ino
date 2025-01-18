@@ -1,5 +1,3 @@
-
-#include <Arduino.h>
 #include <ParallelComm.h>
 
 #define SENDERPIN 10   // deve ser o mesmo para os dois lados
@@ -18,9 +16,15 @@ void setup()
     comm.begin();
     period = millis() + 1000;
 }
+
+// 6 stages sender machine state
 // 1355 msg / seg ~= 21600 bps - 6 stages sender machine state
-// 2970 msg / seg ~= 23760 bps - 3 stages sender machine state
-// 4160 msg / seg ~= 33280 bps - 3 stages sender machine state + port manipulation
+// 3 stages sender machine state
+// 2970 msg / seg ~= 23760 bps - 
+// 4160 msg / seg ~= 33280 bps - native port manipulation
+// 3400 msg / seg ~= 27200 bps - receiver with digitalWriteFast library (probably due to caller functions)
+// 2970 msg / seg ~= 23720 bps - sender and receiver with digitalWriteFast library (probably due to caller functions)
+
 void loop()
 {
     if (comm.updateReceiver(msgValue))
