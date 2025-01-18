@@ -11,7 +11,7 @@ CPU code to another microcontroller connected to the display.
 The library was born. Today it sends up to 2 bytes and you can send 2 
 numbers at once: 
 first number with the first 8 bits of a potentiometer, 
-and the second number, 5 bits bits to with "potentiometer identifier".
+and the second number, 5 bits with "potentiometer identifier".
 If you need more , create a byte control.
 
 As soon as I have the DSP project ready, I will post photos.
