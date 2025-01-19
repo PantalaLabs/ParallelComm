@@ -14,7 +14,7 @@ first number with the first 8 bits of a potentiometer,
 and the second number, 5 bits with "potentiometer identifier".
 If you need more , create a byte control.
 
-As soon as I have the DSP project ready, I will post photos.
+As soon as I have the DSP project ready, I will post photos. 
 
 Performance,
 
