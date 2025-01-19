@@ -178,35 +178,6 @@ public:
         }
         return data;
     }
-
-#include <Arduino.h>
-
-    // Empacota números em um uint32_t com base nos tamanhos de bits fornecidos
-    uint32_t packNumbers(const uint16_t *numbers, const uint8_t *bitSizes, size_t count)
-    {
-        uint32_t packed = 0;
-        uint8_t bitOffset = 0;
-
-        for (size_t i = 0; i < count; i++)
-        {
-            packed |= ((uint32_t)(numbers[i] & ((1UL << bitSizes[i]) - 1))) << bitOffset;
-            bitOffset += bitSizes[i];
-        }
-
-        return packed;
-    }
-
-    // Desempacota números de um uint32_t com base nos tamanhos de bits fornecidos
-    void unpackNumbers(uint32_t packed, uint16_t *numbers, const uint8_t *bitSizes, size_t count)
-    {
-        uint8_t bitOffset = 0;
-
-        for (size_t i = 0; i < count; i++)
-        {
-            numbers[i] = (packed >> bitOffset) & ((1UL << bitSizes[i]) - 1);
-            bitOffset += bitSizes[i];
-        }
-    }
 };
 
 #endif // Fim de PARALLELCOMM_H
