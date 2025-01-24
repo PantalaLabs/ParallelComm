@@ -20,16 +20,7 @@ void loop()
   if (comm.updateSender(data))
   {
     // example 1 , one 8 bit number
-    // data = random(235, 250);
-    // Serial.println(data);
-
-    // example 2 , send one 5 bit number and another 3 bit number
-    num1 = random(27, 30);
-    num2 = random(5);
-    data = PACK_2NUMSTO_XBITS(num1, num2, 5, 8);
-    Serial.print("sending: ");
-    Serial.print(data, BIN);
-    Serial.print(" " + String(data));
-    Serial.println(" " + String(num1) + " " + String(num2));
+    data = random(235, 250);
+    Serial.println(data);
   }
 }

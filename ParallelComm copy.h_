@@ -126,7 +126,7 @@ public:
             {
                 for (int i = 0; i < dataBusSize; i++)
                 {
-                    WRITE_PIN(dataBus[i], (content >> i) & 0x01); // Apenas os primeiros dataBusSize bits são enviados
+                    WRITE_PIN(dataBus[i], (content >> i) & 0x01);
                 }
                 WRITE_PIN(senderPin, LOW);
                 senderState = SENDER_WAITING_SECOND_ACK;
@@ -176,71 +176,7 @@ public:
         {
             data |= (READ_PIN(dataBus[i]) << i);
         }
-        // Aplica uma máscara para garantir que apenas os primeiros dataBusSize bits sejam considerados
-        data &= (1 << dataBusSize) - 1;
         return data;
-    }
-
-    uint16_t packNumbers(const uint16_t numbers[], const uint8_t bits[], uint8_t count)
-    {
-        uint16_t packed = 0;
-        uint8_t totalBits = 0;
-
-
-        Serial.print("dataBusSize: ");
-        Serial.println(dataBusSize);
-
-        // Calcula o total de bits necessários
-        for (uint8_t i = 0; i < count; i++)
-        {
-            totalBits += bits[i];
-        }
-
-        // Verifica se o total de bits excede 16 bits
-        if (totalBits > 16)
-        {
-            Serial.println("Erro: Total de bits excede 16.");
-            return 0;
-        }
-
-        // Empacota os números
-        for (uint8_t i = 0; i < count; i++)
-        {
-            packed |= (numbers[i] & ((1UL << bits[i]) - 1)) << (totalBits - bits[i]);
-            totalBits -= bits[i];
-        }
-
-        return packed;
-    }
-
-    void unpackNumbers(uint16_t packed, uint16_t numbers[], const uint8_t bits[], uint8_t count)
-    {
-        // Garante que o valor empacotado está limitado ao tamanho do barramento
-        packed &= (1UL << dataBusSize) - 1;
-
-        uint8_t totalBits = 0;
-
-        Serial.print("dataBusSize: ");
-        Serial.println(dataBusSize);
-
-        // Calcula o total de bits necessários
-        for (uint8_t i = 0; i < count; i++)
-        {
-            totalBits += bits[i];
-        }
-
-        if (totalBits > dataBusSize)
-        {
-            Serial.println("Erro: Total de bits excede o tamanho do barramento.");
-            return;
-        }
-
-        // Desempacota os números
-        for (uint8_t i = 0; i < count; i++)
-        {
-            numbers[i] = (packed >> (totalBits - bits[i])) & ((1UL << bits[i]) - 1);
-            totalBits -= bits[i];
-        }
     }
 };
 

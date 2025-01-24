@@ -25,16 +25,7 @@ void loop()
   {
     count++;
     // example 1 - one 8 bit number
-    // Serial.println(msgValue);
-
-    // example 2 , receive one 5 bit number and another 3 bit number
-    UNPACK_2NUMSFROM_XBITS(msgValue, num1, num2, 5, 8);
-
-    Serial.print("received: ");
-    Serial.print(msgValue, BIN);
-    Serial.print(" " + String(msgValue));
-    Serial.println(" " + String(num1) + " " + String(num2));
-
+    Serial.println(msgValue);
     delay(800);
   }
   if (millis() >= period)
