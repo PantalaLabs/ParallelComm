@@ -4,15 +4,15 @@
 #include <Arduino.h>
 #include "ParallelCommAVRMacros.h"
 
-#define PACK_2NUMSTO_XBITS(num1, num2, bits_num1, bits_total)          \
-    (((num1 & ((1UL << bits_num1) - 1)) << (bits_total - bits_num1)) | \
-     (num2 & ((1UL << (bits_total - bits_num1)) - 1)))
+#define PACK_2NUMS(num1, num2, bits_num1, bits_num2) \
+    (((num1 & ((1UL << bits_num1) - 1)) << bits_num2) |      \
+     (num2 & ((1UL << bits_num2) - 1)))
 
-#define UNPACK_2NUMSFROM_XBITS(packed, num1, num2, bits_num1, bits_total)       \
-    do                                                                          \
-    {                                                                           \
-        num1 = (packed >> (bits_total - bits_num1)) & ((1UL << bits_num1) - 1); \
-        num2 = packed & ((1UL << (bits_total - bits_num1)) - 1);                \
+#define UNPACK_2NUMS(packed, num1, num2, bits_num1, bits_num2) \
+    do                                                                   \
+    {                                                                    \
+        num1 = (packed >> bits_num2) & ((1UL << bits_num1) - 1);         \
+        num2 = packed & ((1UL << bits_num2) - 1);                        \
     } while (0)
 
 #define WRITE_PIN(pin, value) digitalWrite(pin, value)
@@ -73,6 +73,8 @@ public:
         // Configura os pinos conforme o papel
         if (role == SENDER)
         {
+            SET_PIN_OUTPUT(senderPin);
+            SET_PIN_INPUT(receiverPin);
             for (int i = 0; i < dataBusSize; i++)
             {
                 SET_PIN_OUTPUT(dataBus[i]);
@@ -80,6 +82,8 @@ public:
         }
         else
         {
+            SET_PIN_INPUT(senderPin);
+            SET_PIN_OUTPUT(receiverPin);
             for (int i = 0; i < dataBusSize; i++)
             {
                 SET_PIN_INPUT(dataBus[i]);
@@ -97,16 +101,6 @@ public:
 
     void begin()
     {
-        if (role == SENDER)
-        {
-            SET_PIN_OUTPUT(senderPin);
-            SET_PIN_INPUT(receiverPin);
-        }
-        else
-        {
-            SET_PIN_INPUT(senderPin);
-            SET_PIN_OUTPUT(receiverPin);
-        }
     }
 
     bool updateSender(uint16_t content = 0)
@@ -185,7 +179,6 @@ public:
     {
         uint16_t packed = 0;
         uint8_t totalBits = 0;
-
 
         Serial.print("dataBusSize: ");
         Serial.println(dataBusSize);

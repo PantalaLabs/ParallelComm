@@ -25,7 +25,7 @@ void loop()
   {
     count++;
     // example 2 , receive one 5 bit number and another 3 bit number
-    UNPACK_2NUMSFROM_XBITS(msgValue, num1, num2, 5, 8);
+    UNPACK_2NUMS(msgValue, num1, num2, 5, 3);
 
     Serial.print("received: ");
     Serial.print(msgValue, BIN);

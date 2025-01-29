@@ -22,7 +22,7 @@ void loop()
     // example 2 , send one 5 bit number and another 3 bit number
     num1 = random(27, 30);
     num2 = random(5);
-    data = PACK_2NUMSTO_XBITS(num1, num2, 5, 8);
+    data = PACK_2NUM(num1, num2, 5, 3);
     Serial.print("sending: ");
     Serial.print(data, BIN);
     Serial.print(" " + String(data));
