@@ -1,9 +1,9 @@
 #include <ParallelComm.h>
 
-#define SENDERPIN 12   // same to Sender and Rceiver
-#define RECEIVERPIN 13 // same to Sender and Rceiver
+#define RX 12 // from SENDER TX PIN
+#define TX 13 // to SENDER RX pin
 uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-ParallelComm comm(dataBusPins, SENDERPIN, RECEIVERPIN, RECEIVER);
+ParallelComm comm(dataBusPins, RX, TX, RECEIVER);
 
 uint16_t packed;             // parallel message
 uint16_t unpackedNumbers[3]; // unpacked numbers

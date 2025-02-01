@@ -1,10 +1,10 @@
 #include <ParallelComm.h>
 
-#define SENDERPIN 12   // deve ser o mesmo para os dois lados
-#define RECEIVERPIN 13 // deve ser o mesmo para os dois lados
+#define RX 12   // from SENDER TX PIN
+#define TX 13   // to SENDER RX pin
 uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
 
-ParallelComm comm(dataBusPins, SENDERPIN, RECEIVERPIN, RECEIVER);
+ParallelComm comm(dataBusPins, RX, TX, RECEIVER);
 
 uint16_t msgValue = 0; // importante ser 16 bits
 uint8_t num1;
@@ -25,7 +25,7 @@ void loop()
   {
     count++;
     // example 2 , receive one 5 bit number and another 3 bit number
-    UNPACK_2NUMS(msgValue, num1, num2, 5, 3);
+    UNPACK_2NUMSFROM_XBITS(msgValue, num1, num2, 5, 8);
 
     Serial.print("received: ");
     Serial.print(msgValue, BIN);

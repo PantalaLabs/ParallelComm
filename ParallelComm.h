@@ -4,15 +4,15 @@
 #include <Arduino.h>
 #include "ParallelCommAVRMacros.h"
 
-#define PACK_2NUMS(num1, num2, bits_num1, bits_num2) \
-    (((num1 & ((1UL << bits_num1) - 1)) << bits_num2) |      \
-     (num2 & ((1UL << bits_num2) - 1)))
+#define PACK_2NUMSTO_XBITS(num1, num2, bits_num1, bits_total)          \
+    (((num1 & ((1UL << bits_num1) - 1)) << (bits_total - bits_num1)) | \
+     (num2 & ((1UL << (bits_total - bits_num1)) - 1)))
 
-#define UNPACK_2NUMS(packed, num1, num2, bits_num1, bits_num2) \
-    do                                                                   \
-    {                                                                    \
-        num1 = (packed >> bits_num2) & ((1UL << bits_num1) - 1);         \
-        num2 = packed & ((1UL << bits_num2) - 1);                        \
+#define UNPACK_2NUMSFROM_XBITS(packed, num1, num2, bits_num1, bits_total)       \
+    do                                                                          \
+    {                                                                           \
+        num1 = (packed >> (bits_total - bits_num1)) & ((1UL << bits_num1) - 1); \
+        num2 = packed & ((1UL << (bits_total - bits_num1)) - 1);                \
     } while (0)
 
 #define WRITE_PIN(pin, value) digitalWrite(pin, value)
@@ -47,8 +47,8 @@ class ParallelComm
 private:
     uint8_t *dataBus;    // Pinos do barramento de dados (alocado dinamicamente)
     uint8_t dataBusSize; // Número de bits (tamanho do barramento de dados)
-    uint8_t senderPin;   // Pino controlado pelo Master
-    uint8_t receiverPin; // Pino controlado pelo Receiver
+    uint8_t senderTX;   // Pino controlado pelo Master
+    uint8_t receiverTX; // Pino controlado pelo Receiver
     DeviceRole role;     // Papel do dispositivo (Master ou Receiver)
     SenderState senderState;
     ReceiverState receiverState;
@@ -56,40 +56,18 @@ private:
 public:
     // Construtor com dedução automática do tamanho do array
     template <size_t N>
-    ParallelComm(uint8_t (&dataBusPins)[N], uint8_t sender, uint8_t receiver, DeviceRole deviceRole)
+    ParallelComm(uint8_t (&dataBusPins)[N], uint8_t senderTX, uint8_t receiverTX, DeviceRole deviceRole)
     {
         dataBusSize = N;                    // Calcula o tamanho do array automaticamente
         dataBus = new uint8_t[dataBusSize]; // Aloca memória dinamicamente para o barramento
-
-        // Configura os pinos do barramento de dados
+        // Internaliza os pinos do barramento de dados
         for (int i = 0; i < dataBusSize; i++)
         {
             dataBus[i] = dataBusPins[i];
         }
-        senderPin = sender;
-        receiverPin = receiver;
+        senderTX = senderTX;
+        receiverTX = receiverTX;
         role = deviceRole;
-
-        // Configura os pinos conforme o papel
-        if (role == SENDER)
-        {
-            SET_PIN_OUTPUT(senderPin);
-            SET_PIN_INPUT(receiverPin);
-            for (int i = 0; i < dataBusSize; i++)
-            {
-                SET_PIN_OUTPUT(dataBus[i]);
-            }
-        }
-        else
-        {
-            SET_PIN_INPUT(senderPin);
-            SET_PIN_OUTPUT(receiverPin);
-            for (int i = 0; i < dataBusSize; i++)
-            {
-                SET_PIN_INPUT(dataBus[i]);
-            }
-        }
-
         senderState = SENDER_IDLE;
         receiverState = RECEIVER_IDLE;
     }
@@ -101,6 +79,24 @@ public:
 
     void begin()
     {
+        if (role == SENDER)
+        {
+            for (int i = 0; i < dataBusSize; i++)
+            {
+                SET_PIN_OUTPUT(dataBus[i]);
+            }
+            SET_PIN_OUTPUT(senderTX);
+            SET_PIN_INPUT(receiverTX);
+        }
+        else
+        {
+            for (int i = 0; i < dataBusSize; i++)
+            {
+                SET_PIN_INPUT(dataBus[i]);
+            }
+            SET_PIN_INPUT(senderTX);
+            SET_PIN_OUTPUT(receiverTX);
+        }
     }
 
     bool updateSender(uint16_t content = 0)
@@ -108,27 +104,27 @@ public:
         switch (senderState)
         {
         case SENDER_IDLE:
-            if (!READ_PIN(receiverPin))
+            if (!READ_PIN(receiverTX))
             {
-                WRITE_PIN(senderPin, HIGH);
+                WRITE_PIN(senderTX, HIGH);
                 senderState = SENDER_WAITING_FIRST_ACK;
             }
             break;
 
         case SENDER_WAITING_FIRST_ACK:
-            if (READ_PIN(receiverPin))
+            if (READ_PIN(receiverTX))
             {
                 for (int i = 0; i < dataBusSize; i++)
                 {
                     WRITE_PIN(dataBus[i], (content >> i) & 0x01); // Apenas os primeiros dataBusSize bits são enviados
                 }
-                WRITE_PIN(senderPin, LOW);
+                WRITE_PIN(senderTX, LOW);
                 senderState = SENDER_WAITING_SECOND_ACK;
             }
             break;
 
         case SENDER_WAITING_SECOND_ACK:
-            if (!READ_PIN(receiverPin))
+            if (!READ_PIN(receiverTX))
             {
                 senderState = SENDER_IDLE;
                 return true;
@@ -143,18 +139,18 @@ public:
         switch (receiverState)
         {
         case RECEIVER_IDLE:
-            if (READ_PIN(senderPin) == HIGH)
+            if (READ_PIN(senderTX) == HIGH)
             {
                 receiverState = RECEIVER_WAITING_BYTE;
-                WRITE_PIN(receiverPin, HIGH);
+                WRITE_PIN(receiverTX, HIGH);
             }
             break;
 
         case RECEIVER_WAITING_BYTE:
-            if (READ_PIN(senderPin) == LOW)
+            if (READ_PIN(senderTX) == LOW)
             {
                 content = readData();
-                WRITE_PIN(receiverPin, LOW);
+                WRITE_PIN(receiverTX, LOW);
                 receiverState = RECEIVER_IDLE;
                 return true;
             }
@@ -180,8 +176,9 @@ public:
         uint16_t packed = 0;
         uint8_t totalBits = 0;
 
-        Serial.print("dataBusSize: ");
-        Serial.println(dataBusSize);
+
+        // Serial.print("dataBusSize: ");
+        // Serial.println(dataBusSize);
 
         // Calcula o total de bits necessários
         for (uint8_t i = 0; i < count; i++)
@@ -213,8 +210,8 @@ public:
 
         uint8_t totalBits = 0;
 
-        Serial.print("dataBusSize: ");
-        Serial.println(dataBusSize);
+        // Serial.print("dataBusSize: ");
+        // Serial.println(dataBusSize);
 
         // Calcula o total de bits necessários
         for (uint8_t i = 0; i < count; i++)

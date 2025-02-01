@@ -1,11 +1,11 @@
 #include <ParallelComm.h>
 
-#define SENDERPIN 12   // same to Sender and Rceiver
-#define RECEIVERPIN 13 // same to Sender and Rceiver
+#define TX 12 // to RECEIVER RX pin
+#define RX 13 // from RECEIVER TX pin
 uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-ParallelComm comm(dataBusPins, SENDERPIN, RECEIVERPIN, SENDER);
-uint16_t packed;
+ParallelComm comm(dataBusPins, TX, RX, SENDER);
 
+uint16_t packed;
 uint16_t numbers[] = {10, 5, 7}; // numbers to pack
 uint8_t bits[] = {4, 3, 3};      // bits for each number
 uint8_t count = 3;               // number quantity

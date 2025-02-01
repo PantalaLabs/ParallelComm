@@ -1,12 +1,13 @@
 #include <ParallelComm.h>
 
-#define SENDERPIN 12   // deve ser o mesmo para os dois lados
-#define RECEIVERPIN 13 // deve ser o mesmo para os dois lados
+#define TX 12 // to RECEIVER RX pin
+#define RX 13 // from RECEIVER TX pin
 uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
+ParallelComm comm(dataBusPins, TX, RX, SENDER);
+
 uint16_t data;
 uint8_t num1;
 uint8_t num2;
-ParallelComm comm(dataBusPins, SENDERPIN, RECEIVERPIN, SENDER);
 
 void setup()
 {
