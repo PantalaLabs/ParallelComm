@@ -1,7 +1,7 @@
 
 # ParallelComm Library
 
-Useful library to send/receive data through digital pins between boards or 
+Library to send/receive data through digital pins between boards or 
 between processors on the same board
 
 ## Motivation
