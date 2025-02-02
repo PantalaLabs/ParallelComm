@@ -18,12 +18,11 @@ values concatenated up to 16 bits.
 
 ## Dependencies
 
-thanks to ArminJo
-https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
-
 thanks to KurtE
 https://github.com/KurtE/UNOR4-stuff/tree/main/libraries/GIGA_digitalWriteFast
 
+thanks to ArminJo
+https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
 
 ## Features
 
