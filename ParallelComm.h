@@ -14,7 +14,7 @@
     defined(ARDUINO_AVR_UNO)
 // obrigado a ArminJo pela biblioteca para AVR
 // https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
-#include "digitalWriteFast.h"
+#include <digitalWriteFast.h>
 #define WRITE_PIN(pin, value) digitalWriteFast(pin, value)
 #define READ_PIN(pin) digitalReadFast(pin)
 #define SET_PIN_MODE(pin, mode) pinMode(pin, mode)

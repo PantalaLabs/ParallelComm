@@ -19,6 +19,15 @@ Like a DSP running in one core and a OLED display on another.
 You can send up to 16 bytes per call or you can send 2 
 values concatenated up to 16 bytes.
 
+## Dependencies
+
+thanks to ArminJo
+https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
+
+thanks to KurtE
+https://github.com/KurtE/UNOR4-stuff/tree/main/libraries/GIGA_digitalWriteFast
+
+
 ## Performance
 ```
 UNO->UNO 
