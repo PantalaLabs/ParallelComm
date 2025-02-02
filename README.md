@@ -9,11 +9,11 @@ between cores on the same uC (not tested yet).
 CPU cycle hungry projects where it is not possible at all to make any 
 CPU blocking serial calls.
 
-In my case, a DSP consumes almost all of the CPU, leaving only a few 
-fractions of time available, enough to configure some digital pins and 
+In my case, a DSP consumes almost all of the CPU, leaving only a few time 
+available, enough to configure some digital pins and 
 transfer data to another uC connected to a Oled Display.
 
-You can send up to 16 bits per call or you can split into any number of  
+You can send up to 16 bits per call or split into any number of  
 values concatenated up to 16 bits.
 
 ## Dependencies
