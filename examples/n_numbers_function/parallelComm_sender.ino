@@ -1,7 +1,7 @@
 #include <ParallelComm.h>
 
-#define TX 12 // to RECEIVER RX pin
-#define RX 13 // from RECEIVER TX pin
+#define TX 12 // connect to RECEIVER RX pin
+#define RX 13 // connect to RECEIVER TX pin
 uint8_t dataBusPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 ParallelComm comm(dataBusPins, TX, RX, SENDER);
 
