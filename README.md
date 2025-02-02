@@ -1,9 +1,8 @@
 
 # ParallelComm Library
 
-Non-blocking library to send/receive data through digital pins between boards or 
-between processors on the same board.
-Not tested between two cores of the same uC.
+Non-blocking library to send/receive data through digital pins between uC or 
+between cores on the same uC (not tested yet).
 
 ## Motivation
 
