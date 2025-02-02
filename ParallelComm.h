@@ -2,12 +2,56 @@
 #define PARALLELCOMM_H
 
 #include <Arduino.h>
-#include "ParallelCommAVRMacros.h"
 
+#if (defined(ARDUINO_AVR_MEGA) ||     \
+     defined(ARDUINO_AVR_MEGA1280) || \
+     defined(ARDUINO_AVR_MEGA2560) || \
+     defined(__AVR_ATmega1280__) ||   \
+     defined(__AVR_ATmega1281__) ||   \
+     defined(__AVR_ATmega2560__) ||   \
+     defined(__AVR_ATmega2561__)) ||  \
+    defined(ARDUINO_AVR_NANO) ||      \
+    defined(ARDUINO_AVR_UNO)
+// obrigado a ArminJo pela biblioteca para AVR
+// https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
+#include "digitalWriteFast.h"
+#define WRITE_PIN(pin, value) digitalWriteFast(pin, value)
+#define READ_PIN(pin) digitalReadFast(pin)
+#define SET_PIN_MODE(pin, mode) pinMode(pin, mode)
+#define SET_PIN_OUTPUT(pin) pinMode(pin, OUTPUT)
+#define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
+
+#elif defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_H7_M7)
+// obrigado a KurtE pela biblioteca para GIGA
+// https://github.com/KurtE/UNOR4-stuff/tree/main/libraries/GIGA_digitalWriteFast
+#include "GIGA_digitalWriteFast.h"
+
+#define WRITE_PIN(pin, value) digitalWriteFast(pin, value)
+#define READ_PIN(pin) digitalReadFast(pin)
+#define SET_PIN_MODE(pin, mode) pinMode(pin, mode)
+#define SET_PIN_OUTPUT(pin) pinMode(pin, OUTPUT)
+#define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
+
+#else
+// Fallback para placas que não suportam manipulação direta de registradores
+#define WRITE_PIN(pin, value) digitalWrite(pin, value)
+#define READ_PIN(pin) digitalRead(pin)
+#define SET_PIN_MODE(pin, mode) pinMode(pin, mode)
+#define SET_PIN_OUTPUT(pin) pinMode(pin, OUTPUT)
+#define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
+
+#endif // Fim da definição de macros para placas específicas
+
+// por que usei bits_total ao invés de bits_num1 e bits_num2 ?
+// por que é mais fácil estipular o total de bit do canal e trabalhar com ele
+// pois permanece invariável durante todo o processo e pod-se usar um #defina prá ele
+
+// empacota 2 numeros de bits_num1 bits para um canal de bits_total bits
 #define PACK_2NUMSTO_XBITS(num1, num2, bits_num1, bits_total)          \
     (((num1 & ((1UL << bits_num1) - 1)) << (bits_total - bits_num1)) | \
      (num2 & ((1UL << (bits_total - bits_num1)) - 1)))
 
+// desempacota 2 numeros de bits_num1 bits de um canal de bits_total bits
 #define UNPACK_2NUMSFROM_XBITS(packed, num1, num2, bits_num1, bits_total)       \
     do                                                                          \
     {                                                                           \
@@ -47,8 +91,8 @@ class ParallelComm
 private:
     uint8_t *dataBus;    // Pinos do barramento de dados (alocado dinamicamente)
     uint8_t dataBusSize; // Número de bits (tamanho do barramento de dados)
-    uint8_t senderTX;   // Pino controlado pelo Master
-    uint8_t receiverTX; // Pino controlado pelo Receiver
+    uint8_t senderTX;    // Pino controlado pelo Master
+    uint8_t receiverTX;  // Pino controlado pelo Receiver
     DeviceRole role;     // Papel do dispositivo (Master ou Receiver)
     SenderState senderState;
     ReceiverState receiverState;
@@ -103,30 +147,30 @@ public:
     {
         switch (senderState)
         {
-        case SENDER_IDLE:
-            if (!READ_PIN(receiverTX))
+        case SENDER_IDLE:              // se sender idle
+            if (!READ_PIN(receiverTX)) // e receiver idle
             {
-                WRITE_PIN(senderTX, HIGH);
-                senderState = SENDER_WAITING_FIRST_ACK;
+                WRITE_PIN(senderTX, HIGH);              // requer ack
+                senderState = SENDER_WAITING_FIRST_ACK; // estado : espera ack do receiver
             }
             break;
 
-        case SENDER_WAITING_FIRST_ACK:
-            if (READ_PIN(receiverTX))
+        case SENDER_WAITING_FIRST_ACK: // se sender esperando ack
+            if (READ_PIN(receiverTX))  // e ack recebido
             {
-                for (int i = 0; i < dataBusSize; i++)
+                for (int i = 0; i < dataBusSize; i++) // envia os bits
                 {
-                    WRITE_PIN(dataBus[i], (content >> i) & 0x01); // Apenas os primeiros dataBusSize bits são enviados
+                    WRITE_PIN(dataBus[i], (content >> i) & 0x01);
                 }
-                WRITE_PIN(senderTX, LOW);
-                senderState = SENDER_WAITING_SECOND_ACK;
+                WRITE_PIN(senderTX, LOW);                // requer ack do reciver
+                senderState = SENDER_WAITING_SECOND_ACK; // estado : espera segundo ack do receiver
             }
             break;
 
-        case SENDER_WAITING_SECOND_ACK:
-            if (!READ_PIN(receiverTX))
+        case SENDER_WAITING_SECOND_ACK: // se esperando ack do receiver
+            if (!READ_PIN(receiverTX))  // e recebeu ack do receiver
             {
-                senderState = SENDER_IDLE;
+                senderState = SENDER_IDLE; // mensgem enviada
                 return true;
             }
             break;
@@ -138,27 +182,27 @@ public:
     {
         switch (receiverState)
         {
-        case RECEIVER_IDLE:
-            if (READ_PIN(senderTX) == HIGH)
+        case RECEIVER_IDLE:                 // se receiver idle
+            if (READ_PIN(senderTX) == HIGH) // e recebe requisição para envio
             {
-                receiverState = RECEIVER_WAITING_BYTE;
-                WRITE_PIN(receiverTX, HIGH);
+                WRITE_PIN(receiverTX, HIGH);           // envia ack
+                receiverState = RECEIVER_WAITING_BYTE; // estado : espera mensgem do sender
             }
             break;
 
-        case RECEIVER_WAITING_BYTE:
-            if (READ_PIN(senderTX) == LOW)
+        case RECEIVER_WAITING_BYTE:        // se receiver esperando mensagem do sender
+            if (READ_PIN(senderTX) == LOW) // se já tem os bits na porta e recebe fim de mensagem
             {
-                content = readData();
-                WRITE_PIN(receiverTX, LOW);
-                receiverState = RECEIVER_IDLE;
+                content = readData();          // lê os bits
+                WRITE_PIN(receiverTX, LOW);    // envia ack de mensagem completa
+                receiverState = RECEIVER_IDLE; // agaurda próxima mensagem
                 return true;
             }
             break;
         }
         return false;
     }
-
+    // lê os bits na porta e armazena em data
     uint16_t readData()
     {
         uint16_t data = 0;
@@ -171,11 +215,11 @@ public:
         return data;
     }
 
+    // empacota varios numeros de n bits
     uint16_t packNumbers(const uint16_t numbers[], const uint8_t bits[], uint8_t count)
     {
         uint16_t packed = 0;
         uint8_t totalBits = 0;
-
 
         // Serial.print("dataBusSize: ");
         // Serial.println(dataBusSize);
@@ -203,6 +247,7 @@ public:
         return packed;
     }
 
+    // desempacota varios numeros de n bits
     void unpackNumbers(uint16_t packed, uint16_t numbers[], const uint8_t bits[], uint8_t count)
     {
         // Garante que o valor empacotado está limitado ao tamanho do barramento

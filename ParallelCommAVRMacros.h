@@ -1,8 +1,6 @@
 #ifndef PARALLELCOMMMACROS_H
 #define PARALLELCOMMMACROS_H
 
-// Macros para manipulação de pinos (compatíveis com Arduino Uno e Nano)
-#if defined(ARDUINO_AVR_NANO) || defined(ARDUINO_AVR_UNO)
 // Manipulação de pinos usando registradores para ATmega328P
 #define WRITE_PIN(pin, value)            \
     if (pin >= 0 && pin <= 7)            \
@@ -58,14 +56,4 @@
 #define SET_PIN_OUTPUT(pin) SET_PIN_MODE(pin, OUTPUT)
 #define SET_PIN_INPUT(pin) SET_PIN_MODE(pin, INPUT)
 
-#else
-
-// Fallback para placas que não suportam manipulação direta de registradores
-#define WRITE_PIN(pin, value) digitalWrite(pin, value)
-#define READ_PIN(pin) digitalRead(pin)
-#define SET_PIN_MODE(pin, mode) pinMode(pin, mode)
-#define SET_PIN_OUTPUT(pin) pinMode(pin, OUTPUT)
-#define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
-
-#endif // Fim da definição de macros para placas específicas
 #endif
