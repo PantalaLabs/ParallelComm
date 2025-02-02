@@ -1,7 +1,7 @@
 
 # ParallelComm Library
 
-Library to send/receive data through digital pins between boards or 
+Non-blocking library to send/receive data through digital pins between boards or 
 between processors on the same board.
 Not tested between two cores of the same uC.
 
