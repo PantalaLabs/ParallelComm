@@ -32,11 +32,5 @@ https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
 
 
 ```ruby
-               ___________________
-Sender________/          |||||||| \_______________
-              v                   v
-                  ^                       ^
-                  ________________________
-Receiver_________/               |||||||| \____
 
 ```
