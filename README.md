@@ -9,7 +9,7 @@ between cores on the same uC (not tested yet).
 CPU cycle hungry projects where it is not possible at all to make any 
 CPU blocking serial calls.
 
-In my case, a DSP consumes almost all of the CPU, leaving only a few time 
+In my case, an audio DSP consumes almost all of the CPU, leaving only a few time 
 available, enough to configure digital pins and 
 transfer data to another uC connected to an Oled Display.
 
