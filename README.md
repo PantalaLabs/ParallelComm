@@ -13,7 +13,7 @@ In my case, a DSP consumes almost all of the CPU, leaving only a few time
 available, enough to configure digital pins and 
 transfer data to another uC connected to an Oled Display.
 
-You can send up to 16 bits per call or split into any number of  
+You can send up to 16 bits per message or split into any number of  
 values concatenated up to 16 bits.
 
 ## Dependencies
