@@ -28,19 +28,12 @@ thanks to KurtE
 https://github.com/KurtE/UNOR4-stuff/tree/main/libraries/GIGA_digitalWriteFast
 
 
-## Performance
-```
-UNO->UNO 
-10 bits , pins 2,3,4,5,6,7,8,9
-12/13 sender / receiver
-4043 msg / seg ~= 32344 bps 
-```
-
 ## Features
 
 - **UP to 16-bits Parallel Communication**: Uses any bits data bus for transmitting data.
-- **Pack and Unpack 2 numbers**: Pack/Unpack 2 numbers to transfer in one send.
-- **Two Device Roles**: Supports **Sender** (Master) and **Receiver** (Slave) roles.
+- **Pack and Unpack 2 numbers MACROS**: Pack/Unpack 2 numbers to transfer in one send.
+- **Pack and Unpack any numbers function**: Pack/Unpack n numbers to transfer in one send.
+- **Two Device Roles**: Supports ONE **Sender** (Master) and ONE **Receiver** (Slave) roles.
 
 
 ```ruby
