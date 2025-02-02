@@ -231,7 +231,7 @@ public:
 
         if (totalBits > 16)
         {
-            Serial.println("Erro: Total de bits excede 16.");
+            Serial.println("Error: Total bits exceeds 16.");
             return 0;
         }
 
@@ -263,7 +263,7 @@ public:
 
         if (totalBits > dataBusSize)
         {
-            Serial.println("Erro: Total de bits excede o tamanho do barramento.");
+            Serial.println("Error: Total bits exceeds bus size.");
             return;
         }
 
