@@ -31,7 +31,7 @@
 #define SET_PIN_INPUT(pin) pinMode(pin, INPUT)
 
 #else
-// Fallback for boards that do not support direct register manipulation
+// Fallback for not supported faster modes
 #define WRITE_PIN(pin, value) digitalWrite(pin, value)
 #define READ_PIN(pin) digitalRead(pin)
 #define SET_PIN_MODE(pin, mode) pinMode(pin, mode)
