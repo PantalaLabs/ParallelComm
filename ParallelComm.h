@@ -93,6 +93,7 @@ private:
     uint8_t dataBusSize;     // Number of bits (data bus size)
     uint8_t senderControl;   // Pin controlled by the Sender
     uint8_t receiverControl; // Pin controlled by the Receiver
+    uint8_t max_bits = 16;   // Max allowed bits
     DeviceRole role;         // Device role (Sender/ Receiver)
     SenderState senderState;
     ReceiverState receiverState;
@@ -224,18 +225,15 @@ public:
         uint16_t packed = 0;
         uint8_t totalBits = 0;
 
-        // Serial.print("dataBusSize: ");
-        // Serial.println(dataBusSize);
-
-        // Calcula o total de bits necessários
+        // Total bits needed
         for (uint8_t i = 0; i < count; i++)
         {
             totalBits += bits[i];
         }
 
-        if (totalBits > 16)
+        if (totalBits > max_bits)
         {
-            Serial.println("Error: Total bits exceeds 16.");
+            Serial.println("Error: Total bits exceeds " + String(max_bits) + ".");
             return 0;
         }
 
@@ -255,9 +253,6 @@ public:
         packed &= (1UL << dataBusSize) - 1;
 
         uint8_t totalBits = 0;
-
-        // Serial.print("dataBusSize: ");
-        // Serial.println(dataBusSize);
 
         // Calculates the total bits required
         for (uint8_t i = 0; i < count; i++)
