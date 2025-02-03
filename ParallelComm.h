@@ -75,8 +75,8 @@ enum DeviceRole
 enum SenderState
 {
     SENDER_IDLE,
-    SENDER_WAITING_FIRST_ACK,
-    SENDER_WAITING_SECOND_ACK
+    SENDER_WAITING_REQUEST_TO_SEND_ACK,
+    SENDER_WAITING_MESSAGE_SENT_ACK
 };
 
 enum ReceiverState
@@ -151,7 +151,7 @@ public:
             if (!READ_PIN(receiverControl)) // and receiver idles
             {
                 WRITE_PIN(senderControl, HIGH);         // request ack
-                senderState = SENDER_WAITING_FIRST_ACK; // state : wait receiver ack
+                senderState = SENDER_WAITING_REQUEST_TO_SEND_ACK; // state : wait receiver ack
             }
             else
             {
@@ -159,7 +159,7 @@ public:
             }
             break;
 
-        case SENDER_WAITING_FIRST_ACK:     // state : wait receiver ack
+        case SENDER_WAITING_REQUEST_TO_SEND_ACK:     // state : wait receiver ack
             if (READ_PIN(receiverControl)) // ack received
             {
                 for (int i = 0; i < dataBusSize; i++) // send bits
@@ -167,11 +167,11 @@ public:
                     WRITE_PIN(dataBus[i], (content >> i) & 0x01);
                 }
                 WRITE_PIN(senderControl, LOW);           // request ack
-                senderState = SENDER_WAITING_SECOND_ACK; // state : wait second receiver ack
+                senderState = SENDER_WAITING_MESSAGE_SENT_ACK; // state : wait second receiver ack
             }
             break;
 
-        case SENDER_WAITING_SECOND_ACK:     // state : wait receiver ack
+        case SENDER_WAITING_MESSAGE_SENT_ACK:     // state : wait receiver ack
             if (!READ_PIN(receiverControl)) // received an ack from the receiver
             {
                 senderState = SENDER_IDLE; // mensge sent
