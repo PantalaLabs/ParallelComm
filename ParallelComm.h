@@ -9,9 +9,7 @@
      defined(__AVR_ATmega1280__) ||   \
      defined(__AVR_ATmega1281__) ||   \
      defined(__AVR_ATmega2560__) ||   \
-     defined(__AVR_ATmega2561__)) ||  \
-    defined(ARDUINO_AVR_NANO) ||      \
-    defined(ARDUINO_AVR_UNO)
+     defined(__AVR_ATmega2561__))
 // thanks to ArminJo
 // https://github.com/ArminJo/digitalWriteFast/blob/master/digitalWriteFast.h
 #include <digitalWriteFast.h>
@@ -74,14 +72,14 @@ enum DeviceRole
 
 enum SenderState
 {
-    SENDER_IDLE,
+    SENDER_IDLING,
     SENDER_WAITING_REQUEST_TO_SEND_ACK,
     SENDER_WAITING_MESSAGE_SENT_ACK
 };
 
 enum ReceiverState
 {
-    RECEIVER_IDLE,
+    RECEIVER_IDLING,
     RECEIVER_WAITING_MESSAGE
 };
 
@@ -112,8 +110,8 @@ public:
         senderControl = senderControl;
         receiverControl = receiverControl;
         role = deviceRole;
-        senderState = SENDER_IDLE;
-        receiverState = RECEIVER_IDLE;
+        senderState = SENDER_IDLING;
+        receiverState = RECEIVER_IDLING;
     }
 
     ~ParallelComm() // Destructor
@@ -147,10 +145,10 @@ public:
     {
         switch (senderState)
         {
-        case SENDER_IDLE:                   // sender : idling
+        case SENDER_IDLING:                 // sender : idling
             if (!READ_PIN(receiverControl)) // and receiver idles
             {
-                WRITE_PIN(senderControl, HIGH);         // request ack
+                WRITE_PIN(senderControl, HIGH);                   // request ack
                 senderState = SENDER_WAITING_REQUEST_TO_SEND_ACK; // state : wait receiver ack
             }
             else
@@ -159,22 +157,22 @@ public:
             }
             break;
 
-        case SENDER_WAITING_REQUEST_TO_SEND_ACK:     // state : wait receiver ack
-            if (READ_PIN(receiverControl)) // ack received
+        case SENDER_WAITING_REQUEST_TO_SEND_ACK: // state : wait receiver ack
+            if (READ_PIN(receiverControl))       // ack received
             {
                 for (int i = 0; i < dataBusSize; i++) // send bits
                 {
                     WRITE_PIN(dataBus[i], (content >> i) & 0x01);
                 }
-                WRITE_PIN(senderControl, LOW);           // request ack
+                WRITE_PIN(senderControl, LOW);                 // request ack
                 senderState = SENDER_WAITING_MESSAGE_SENT_ACK; // state : wait second receiver ack
             }
             break;
 
-        case SENDER_WAITING_MESSAGE_SENT_ACK:     // state : wait receiver ack
-            if (!READ_PIN(receiverControl)) // received an ack from the receiver
+        case SENDER_WAITING_MESSAGE_SENT_ACK: // state : wait receiver ack
+            if (!READ_PIN(receiverControl))   // received an ack from the receiver
             {
-                senderState = SENDER_IDLE; // mensge sent
+                senderState = SENDER_IDLING; // mensge sent
                 return true;
             }
             break;
@@ -186,20 +184,20 @@ public:
     {
         switch (receiverState)
         {
-        case RECEIVER_IDLE:                      // receiver : idling
+        case RECEIVER_IDLING:                    // receiver : idling
             if (READ_PIN(senderControl) == HIGH) // receives request for send
             {
-                WRITE_PIN(receiverControl, HIGH);      // sends ack
+                WRITE_PIN(receiverControl, HIGH);         // sends ack
                 receiverState = RECEIVER_WAITING_MESSAGE; // state : wait for message
             }
             break;
 
-        case RECEIVER_WAITING_MESSAGE:             // state : waiting for message
+        case RECEIVER_WAITING_MESSAGE:          // state : waiting for message
             if (READ_PIN(senderControl) == LOW) // the bits are on the port , end of message
             {
                 content = readData();            // read bits
                 WRITE_PIN(receiverControl, LOW); // sends complete message ack
-                receiverState = RECEIVER_IDLE;   // wait for next message
+                receiverState = RECEIVER_IDLING; // wait for next message
                 return true;
             }
             break;
