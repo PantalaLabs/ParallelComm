@@ -152,6 +152,10 @@ public:
                 WRITE_PIN(senderTX, HIGH);              // request ack
                 senderState = SENDER_WAITING_FIRST_ACK; // state : wait receiver ack
             }
+            else
+            {
+                Serial.println("Error: Receiver must be Idling.");
+            }
             break;
 
         case SENDER_WAITING_FIRST_ACK: // state : wait receiver ack
