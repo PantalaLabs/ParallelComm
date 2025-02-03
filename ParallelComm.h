@@ -89,18 +89,18 @@ enum ReceiverState
 class ParallelComm
 {
 private:
-    uint8_t *dataBus;    // Data bus pins (dynamically allocated)
-    uint8_t dataBusSize; // Number of bits (data bus size)
-    uint8_t senderTX;    // Pin controlled by the Sender
-    uint8_t receiverTX;  // Pin controlled by the Receiver
-    DeviceRole role;     // Device role (Sender/ Receiver)
+    uint8_t *dataBus;        // Data bus pins (dynamically allocated)
+    uint8_t dataBusSize;     // Number of bits (data bus size)
+    uint8_t senderControl;   // Pin controlled by the Sender
+    uint8_t receiverControl; // Pin controlled by the Receiver
+    DeviceRole role;         // Device role (Sender/ Receiver)
     SenderState senderState;
     ReceiverState receiverState;
 
 public:
     // Constructor with automatic deduction of the array size
     template <size_t N>
-    ParallelComm(uint8_t (&dataBusPins)[N], uint8_t senderTX, uint8_t receiverTX, DeviceRole deviceRole)
+    ParallelComm(uint8_t (&dataBusPins)[N], uint8_t senderControl, uint8_t receiverControl, DeviceRole deviceRole)
     {
         dataBusSize = N;                    // Calculate array size automatically
         dataBus = new uint8_t[dataBusSize]; // Dynamically allocates memory to the bus
@@ -108,8 +108,8 @@ public:
         {
             dataBus[i] = dataBusPins[i];
         }
-        senderTX = senderTX;
-        receiverTX = receiverTX;
+        senderControl = senderControl;
+        receiverControl = receiverControl;
         role = deviceRole;
         senderState = SENDER_IDLE;
         receiverState = RECEIVER_IDLE;
@@ -128,8 +128,8 @@ public:
             {
                 SET_PIN_OUTPUT(dataBus[i]);
             }
-            SET_PIN_OUTPUT(senderTX);
-            SET_PIN_INPUT(receiverTX);
+            SET_PIN_OUTPUT(senderControl);
+            SET_PIN_INPUT(receiverControl);
         }
         else
         {
@@ -137,8 +137,8 @@ public:
             {
                 SET_PIN_INPUT(dataBus[i]);
             }
-            SET_PIN_INPUT(senderTX);
-            SET_PIN_OUTPUT(receiverTX);
+            SET_PIN_INPUT(senderControl);
+            SET_PIN_OUTPUT(receiverControl);
         }
     }
 
@@ -146,10 +146,10 @@ public:
     {
         switch (senderState)
         {
-        case SENDER_IDLE:              // sender : idling
-            if (!READ_PIN(receiverTX)) // and receiver idles
+        case SENDER_IDLE:                   // sender : idling
+            if (!READ_PIN(receiverControl)) // and receiver idles
             {
-                WRITE_PIN(senderTX, HIGH);              // request ack
+                WRITE_PIN(senderControl, HIGH);         // request ack
                 senderState = SENDER_WAITING_FIRST_ACK; // state : wait receiver ack
             }
             else
@@ -158,20 +158,20 @@ public:
             }
             break;
 
-        case SENDER_WAITING_FIRST_ACK: // state : wait receiver ack
-            if (READ_PIN(receiverTX))  // ack received
+        case SENDER_WAITING_FIRST_ACK:     // state : wait receiver ack
+            if (READ_PIN(receiverControl)) // ack received
             {
                 for (int i = 0; i < dataBusSize; i++) // send bits
                 {
                     WRITE_PIN(dataBus[i], (content >> i) & 0x01);
                 }
-                WRITE_PIN(senderTX, LOW);                // request ack
+                WRITE_PIN(senderControl, LOW);           // request ack
                 senderState = SENDER_WAITING_SECOND_ACK; // state : wait second receiver ack
             }
             break;
 
-        case SENDER_WAITING_SECOND_ACK: // state : wait receiver ack
-            if (!READ_PIN(receiverTX))  // received an ack from the receiver
+        case SENDER_WAITING_SECOND_ACK:     // state : wait receiver ack
+            if (!READ_PIN(receiverControl)) // received an ack from the receiver
             {
                 senderState = SENDER_IDLE; // mensge sent
                 return true;
@@ -185,20 +185,20 @@ public:
     {
         switch (receiverState)
         {
-        case RECEIVER_IDLE:                 // receiver : idling
-            if (READ_PIN(senderTX) == HIGH) // receives request for send
+        case RECEIVER_IDLE:                      // receiver : idling
+            if (READ_PIN(senderControl) == HIGH) // receives request for send
             {
-                WRITE_PIN(receiverTX, HIGH);           // sends ack
+                WRITE_PIN(receiverControl, HIGH);      // sends ack
                 receiverState = RECEIVER_WAITING_BYTE; // state : wait for message
             }
             break;
 
-        case RECEIVER_WAITING_BYTE:        // state : waiting for message
-            if (READ_PIN(senderTX) == LOW) // the bits are on the port , end of message
+        case RECEIVER_WAITING_BYTE:             // state : waiting for message
+            if (READ_PIN(senderControl) == LOW) // the bits are on the port , end of message
             {
-                content = readData();          // read bits
-                WRITE_PIN(receiverTX, LOW);    // sends complete message ack
-                receiverState = RECEIVER_IDLE; // wait for next message
+                content = readData();            // read bits
+                WRITE_PIN(receiverControl, LOW); // sends complete message ack
+                receiverState = RECEIVER_IDLE;   // wait for next message
                 return true;
             }
             break;
