@@ -82,7 +82,7 @@ enum SenderState
 enum ReceiverState
 {
     RECEIVER_IDLE,
-    RECEIVER_WAITING_BYTE
+    RECEIVER_WAITING_MESSAGE
 };
 
 // ParallelComm class definition
@@ -190,11 +190,11 @@ public:
             if (READ_PIN(senderControl) == HIGH) // receives request for send
             {
                 WRITE_PIN(receiverControl, HIGH);      // sends ack
-                receiverState = RECEIVER_WAITING_BYTE; // state : wait for message
+                receiverState = RECEIVER_WAITING_MESSAGE; // state : wait for message
             }
             break;
 
-        case RECEIVER_WAITING_BYTE:             // state : waiting for message
+        case RECEIVER_WAITING_MESSAGE:             // state : waiting for message
             if (READ_PIN(senderControl) == LOW) // the bits are on the port , end of message
             {
                 content = readData();            // read bits
