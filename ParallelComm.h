@@ -154,7 +154,7 @@ public:
             }
             else
             {
-                Serial.println("Error: Receiver must be Idling.");
+                Serial.println("Error: Receiver must be idling.");
             }
             break;
 
